@@ -7,10 +7,15 @@ import { awsConfig } from "./awsConfig";
 import { paths } from "./paths";
 import { buildCredentialProcessCommand } from "./credentialProcess";
 
-const awsAvailable =
-  spawnSync("aws", ["--version"], { timeout: 10_000 }).status === 0;
+const awsStatus = spawnSync("aws", ["--version"], {
+  timeout: 10_000,
+  stdio: "inherit",
+}).status;
+const awsAvailable = awsStatus === 0;
 if (process.env.AZ2AWS_REQUIRE_AWS_CLI_TESTS && !awsAvailable) {
-  throw new Error("AWS CLI is required for compatibility tests");
+  throw new Error(
+    `AWS CLI is required for compatibility tests (status code: ${awsStatus})`,
+  );
 }
 
 describe.skipIf(!awsAvailable)(

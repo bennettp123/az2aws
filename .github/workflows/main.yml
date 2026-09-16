@@ -113,6 +113,21 @@ jobs:
           fi
           echo "BROWSER_CHROME_BIN=$browser_bin" >> "$GITHUB_ENV"
           "$browser_bin" --version
+
+      - name: debug aws command
+        continue-on-error: true
+        run: |
+          set -x
+          set +e
+          command -v aws
+          which aws
+          pnpm exec -- bash -c 'which aws'
+          node -e 'const { spawnSync } = await import("node:child_process"); spawnSync("aws", ["--version"], { stdio: "inherit" })'
+          pnpm exec -- node -e 'const { spawnSync } = await import("node:child_process"); spawnSync("aws", ["--version"], { stdio: "inherit" })'
+          echo "${PATH}"
+          node -e 'console.log(JSON.stringify(process.env.PATH))'
+          pnpm exec -- node -e 'console.log(JSON.stringify(process.env.PATH))'
+
       - name: Verify compatibility with the installed AWS CLI
         env:
           AZ2AWS_REQUIRE_AWS_CLI_TESTS: "true"
